@@ -969,6 +969,8 @@ def get_disk_serial(device_name, device_type=None, test=None):
     """
     serial_num = ''
     uuid_search_string = ''
+    if device_name == "nbd0":
+        serial_num = "12345"
     line_fields = []
     # udevadm requires the full path for Device Mapped (DM) disks so if our
     # type indicates this then add the '/dev/mapper' path to device_name
@@ -1059,6 +1061,8 @@ def get_virtio_disk_serial(device_name):
     This process may not deal well with spaces in the serial number
     but VMM does not allow this.
     """
+    if device_name == "nbd0":
+        return "12345"
     dev_path = ('/sys/block/%s/serial' % device_name)
     out, err, rc = run_command([CAT, dev_path], throw=False)
     if (rc != 0):
@@ -1574,6 +1578,7 @@ def get_byid_name_map():
                             byid_name_map[line_fields[-1]]):
                         # The current line's by-id name is longer so use it.
                         byid_name_map[line_fields[-1]] = line_fields[-5]
+    byid_name_map['nbd-MineboxDisk'] = 'nbd0'
     return byid_name_map
 
 
