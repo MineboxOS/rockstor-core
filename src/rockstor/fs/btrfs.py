@@ -51,7 +51,10 @@ def add_pool(pool, disks):
     :return o, err, rc from last command executed.
     """
     disks_fp = []
+    got_nbd = False
     for d in disks:
+        if d.startswith("nbd"):
+            got_nbd = True
         disks_fp.append(get_full_path(d))
 
     cmd = [MKFS_BTRFS, '-f', '-d', pool.raid, '-m', pool.raid, '-L',
@@ -59,7 +62,13 @@ def add_pool(pool, disks):
     cmd.extend(disks_fp)
     # Run the create pool command, any exceptions are logged and raised by
     # run_command as a CommandException.
-    out, err, rc = run_command(cmd, log=True)
+    try:
+        out, err, rc = run_command(cmd, log=True)
+    except:
+        if got_nbd:
+            return (None, None, 1)
+        else:
+            raise
     # Note that given our cmd (mkfs.btrfs) is executed with the default
     # run_command flag of throw=True then program execution is stopped in the
     # event of rc != 0 so the following clause is redundant but offers an
