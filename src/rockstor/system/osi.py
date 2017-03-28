@@ -769,7 +769,7 @@ def wipe_disk(disk_byid):
     :return: o, e, rc tuple returned by the run_command wrapper running the
     locally generated wipefs command.
     """
-    disk_byid_withpath = ('/dev/disk/by-id/%s' % disk_byid)
+    disk_byid_withpath = (get_full_path(disk_byid))
     return run_command([WIPEFS, '-a', disk_byid_withpath])
 
 
@@ -785,7 +785,7 @@ def blink_disk(disk_byid, total_exec, read, sleep):
     :param sleep: light off time.
     :return: None.
     """
-    dd_cmd = [DD, 'if=/dev/disk/by-id/%s' % disk_byid, 'of=/dev/null',
+    dd_cmd = [DD, 'if=%s' % get_full_path(disk_byid), 'of=/dev/null',
               'bs=512', 'conv=noerror']
     p = subprocess.Popen(dd_cmd, shell=False, stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
@@ -969,8 +969,8 @@ def get_disk_serial(device_name, device_type=None, test=None):
     """
     serial_num = ''
     uuid_search_string = ''
-    if device_name == "nbd0":
-        serial_num = "12345"
+    if device_name.startswith("nbd"):
+        serial_num = str(12345 + int(device_name[3:]))
     line_fields = []
     # udevadm requires the full path for Device Mapped (DM) disks so if our
     # type indicates this then add the '/dev/mapper' path to device_name
@@ -1061,8 +1061,8 @@ def get_virtio_disk_serial(device_name):
     This process may not deal well with spaces in the serial number
     but VMM does not allow this.
     """
-    if device_name == "nbd0":
-        return "12345"
+    if device_name.startswith("nbd"):
+        return str(12345 + int(device_name[3:]))
     dev_path = ('/sys/block/%s/serial' % device_name)
     out, err, rc = run_command([CAT, dev_path], throw=False)
     if (rc != 0):
@@ -1314,7 +1314,7 @@ def get_disk_power_status(dev_byid):
     # hdparm -C -q /dev/sda
     # drive state is:  active/idle
     out, err, rc = run_command(
-        [HDPARM, '-C', '-q', '/dev/disk/by-id/%s' % dev_byid], throw=False)
+        [HDPARM, '-C', '-q', get_full_path(dev_byid)], throw=False)
     if len(err) != 1:
         # In some instances an error can be returned even with rc=0.
         # ie SG_IO: bad/missing sense data, sb[]:  70 00 05 00 00 00 00 0a ...
@@ -1349,7 +1349,7 @@ def get_disk_APM_level(dev_byid):
     #  APM_level<tab>= off
     #  APM_level<tab>= not supported
     out, err, rc = run_command(
-        [HDPARM, '-B', '-q', '/dev/disk/by-id/%s' % dev_byid], throw=False)
+        [HDPARM, '-B', '-q', get_full_path(dev_byid)], throw=False)
     if len(err) != 1:
         # In some instances an error can be returned even with rc=0.
         # ie SG_IO: bad/missing sense data, sb[]:  70 00 05 00 00 00 00 0a ...
@@ -1578,7 +1578,12 @@ def get_byid_name_map():
                             byid_name_map[line_fields[-1]]):
                         # The current line's by-id name is longer so use it.
                         byid_name_map[line_fields[-1]] = line_fields[-5]
-    byid_name_map['nbd-MineboxDisk'] = 'nbd0'
+    out, err, rc = run_command([LS, '/dev/nbd*'],
+                               throw=True)
+    if rc == 0:
+        for each_line in out:
+            line_fields = each_line.split("/")
+            byid_name_map['nbd-Disk-' + line_fields[-1][3:]] = line_fields[-1]
     return byid_name_map
 
 
@@ -1599,7 +1604,7 @@ def get_dev_temp_name(dev_byid):
     :return: sda type device name without path or if no match is found then
     dev_byid is returned.
     """
-    dev_byid_withpath = '/dev/disk/by-id/%s' % dev_byid
+    dev_byid_withpath = get_full_path(dev_byid)
     try:
         temp_name = os.readlink(dev_byid_withpath).split('/')[-1]
     except OSError:
@@ -1817,7 +1822,7 @@ def read_hdparm_setting(dev_byid):
     infile = '/etc/systemd/system/rockstor-hdparm.service'
     if not os.path.isfile(infile):
         return None
-    dev_byid_withpath = '/dev/disk/by-id/%s' % dev_byid
+    dev_byid_withpath = get_full_path(dev_byid)
     dev_byid_found = False
     with open(infile) as ino:
         for line in ino.readlines():
@@ -1856,7 +1861,9 @@ def enter_standby(dev_byid):
     :return: None or out, err, rc of command
     """
     # TODO: candidate for move to system/hdparm
-    hdparm_command = [HDPARM, '-q', '-y', '/dev/disk/by-id/%s' % dev_byid]
+    if dev_byid.startswith("nbd"):
+        return None
+    hdparm_command = [HDPARM, '-q', '-y', get_full_path(dev_byid)]
     return run_command(hdparm_command)
 
 
@@ -1892,3 +1899,13 @@ def trigger_udev_update():
     :return: o, e, rc as returned by run_command
     """
     return run_command([UDEVADM, 'trigger'])
+
+def get_full_path(by_id):
+    """ Return full path for given device id
+    also works for nbd where there is no device-by-id entry
+    """
+    if by_id.startswith("nbd"):
+        return '/dev/' + by_id
+    else:
+        return '/dev/disk/by-id/' + by_id
+
