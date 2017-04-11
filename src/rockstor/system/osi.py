@@ -969,8 +969,6 @@ def get_disk_serial(device_name, device_type=None, test=None):
     """
     serial_num = ''
     uuid_search_string = ''
-    if device_name.startswith("nbd"):
-        serial_num = str(12345 + int(device_name[3:]))
     line_fields = []
     # udevadm requires the full path for Device Mapped (DM) disks so if our
     # type indicates this then add the '/dev/mapper' path to device_name
@@ -1036,6 +1034,10 @@ def get_disk_serial(device_name, device_type=None, test=None):
                 # have found nothing else.
                 if serial_num == '':
                     serial_num = line_fields[2]
+            elif line_fields[1] == 'MAJOR' and line_fields[2] == '43':
+                # nbd devices have the major number 43, use device name as serial (but not exactly as UI does error on that as well).
+                if serial_num == '':
+                    serial_num = 'mi%s' % device_name
     # should return one of the following in order of priority
     # SCSI_SERIAL, SERIAL_SHORT, SERIAL
     return serial_num
@@ -1062,7 +1064,7 @@ def get_virtio_disk_serial(device_name):
     but VMM does not allow this.
     """
     if device_name.startswith("nbd"):
-        return str(12345 + int(device_name[3:]))
+        return 'mi%s' % device_name
     dev_path = ('/sys/block/%s/serial' % device_name)
     out, err, rc = run_command([CAT, dev_path], throw=False)
     if (rc != 0):
