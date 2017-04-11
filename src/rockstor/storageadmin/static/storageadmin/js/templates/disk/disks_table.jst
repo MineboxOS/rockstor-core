@@ -28,6 +28,8 @@
               <i class="glyphicon glyphicon-info-sign"></i></a>
         {{else if (isRootDevice this.role)}}
               <i class="glyphicon glyphicon-registration-mark" title="Rockstor System Drive." rel="tooltip"></i>
+        {{else if (isNBD this.role)}}
+            <i class="glyphicon glyphicon-home" title="Minebox storage disk." rel="tooltip"></i>
         {{else if this.parted}}
             {{#if (hasUserRole this.role)}}
                 <a href="#disks/role/{{this.name}}" class="user_role_part" data-disk-name="{{this.name}}" title="User Assigned Role found on partitioned disk, click to edit." rel="tooltip">
@@ -80,8 +82,10 @@
           Please ensure that disks are provided with unique serial numbers before proceeding further.</div>
         {{else if this.serial}}
         {{this.serial}}
+        {{#unless (isNBD this.role)}}
         &nbsp;&nbsp;&nbsp;&nbsp;<a href="#disks/blink/{{this.name}}" title="A tool to physically identify the hard drive with this serial number." rel="tooltip">
           <i class="fa fa-lightbulb-o fa-lg"></i></a>&nbsp;
+        {{/unless}}
         {{/checkSerialStatus}}
       </td>
       <td>{{humanReadableSize this.size}}</td>
@@ -111,8 +115,10 @@
         {{#if this.smart_options}}
         {{this.smart_options}}&nbsp;
         {{/if}}
+        {{#unless (isNBD this.role)}}
         <a href="#disks/smartcustom/{{this.name}}" title="Click to add/edit Custom SMART options. Rescan to Apply." rel="tooltip-top">
           <i class="glyphicon glyphicon-pencil"></i></a>
+        {{/unless}}
         {{#unless smart_available}}
         Not Supported
       </td>

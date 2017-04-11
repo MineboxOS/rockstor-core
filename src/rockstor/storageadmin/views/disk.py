@@ -206,6 +206,10 @@ class DiskMixin(object):
                 # but likewise must be specifically attributed (ie to fast
                 # ssd type drives) so we flag in the role system differently.
                 disk_roles_identified['bcachecdev'] = 'bcache-%s' % d.uuid
+            if d.name.startswith('nbd'):
+                # Network block device: we will use it like a one-partition
+                # disk but not report any advanced functionality.
+                disk_roles_identified['nbd'] = d.name
             if d.root is True:
                 # ROOT DISK: scan_disks() has already identified the current
                 # truth regarding the device hosting our root '/' fs so update

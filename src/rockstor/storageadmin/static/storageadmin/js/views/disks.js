@@ -382,6 +382,22 @@ DisksView = RockstorLayoutView.extend({
             return false;
         });
 
+        // Identify nbd devices by return of true / false.
+        // Works by examining the Disk.role field. Based on sister handlebars
+        // helper 'isRootDevice'
+        Handlebars.registerHelper('isNBD', function (role) {
+            var roleAsJson = asJSON(role);
+            if (roleAsJson == false) return false;
+            // We have a json string ie non legacy role info so we can examine:
+            if (roleAsJson.hasOwnProperty('nbd')) {
+                // We have a nbd backing device which can't be deleted and has
+                // no advanced functionality at all.
+                return true;
+            }
+            // In all other cases return false.
+            return false;
+        });
+
         // Identify User assigned role disks by return of true / false.
         // Works by examining the Disk.role field. Based on sister handlebars
         // helper 'isBcache'
