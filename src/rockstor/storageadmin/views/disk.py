@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
 # and the post processing present in scan_disks()
 # LUKS currently stands for full disk crypto container.
 SCAN_DISKS_KNOWN_ROLES = ['mdraid', 'root', 'LUKS', 'openLUKS', 'bcache',
-                          'bcachecdev', 'partitions']
+                          'bcachecdev', 'nbd', 'partitions']
 WHOLE_DISK_FORMAT_ROLES = ['LUKS', 'bcache', 'bcachecdev']
 
 
@@ -316,6 +316,20 @@ class DiskMixin(object):
                 # setup our special root disk db entry in Pool
                 # TODO: dynamically retrieve raid level.
                 p = Pool(name=d.label, raid='single', role='root')
+                p.save()
+                p.disk_set.add(dob)
+                # update disk db object to reflect special root pool status
+                dob.pool = p
+                dob.save()
+                p.size = p.usage_bound()
+                enable_quota(p)
+                p.uuid = btrfs_uuid(dob.name)
+                p.save()
+            # If no pool has yet been found with this disk's label in and
+            # the attached disk is our nbd disk
+            if (dob.pool is None and d.name.startswith('nbd') and d.label):
+                # setup a Pool dynamically
+                p = Pool(name=d.label, raid='single')
                 p.save()
                 p.disk_set.add(dob)
                 # update disk db object to reflect special root pool status
