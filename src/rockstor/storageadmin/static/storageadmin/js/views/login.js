@@ -55,6 +55,7 @@ InitView = RockstorLayoutView.extend({
             new_appliance.save({
                 hostname: RockStorGlobals.hostname,
                 ip: RockStorGlobals.ip,
+                minebox_key: RockStorGlobals.minebox_key,
                 current_appliance: true
             }, {
                 success: function(model, response, options) {
@@ -123,6 +124,7 @@ LoginView = InitView.extend({
                     username: 'required',
                     password: 'required',
                     hostname: 'required',
+                    mbkey: 'required',
                     password_confirmation: {
                         required: 'true',
                         equalTo: '#password'
@@ -137,6 +139,7 @@ LoginView = InitView.extend({
                     var username = _this.$('#username').val();
                     var password = _this.$('#password').val();
                     RockStorGlobals.hostname = _this.$('#hostname').val();
+                    RockStorGlobals.minebox_key = _this.$('#mbkey').val();
 
                     var setupUserModel = Backbone.Model.extend({
                         urlRoot: '/setup_user',
