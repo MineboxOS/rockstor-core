@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
 # and the post processing present in scan_disks()
 # LUKS currently stands for full disk crypto container.
 SCAN_DISKS_KNOWN_ROLES = ['mdraid', 'root', 'LUKS', 'openLUKS', 'bcache',
-                          'bcachecdev', 'nbd', 'partitions']
+                          'bcachecdev', 'nbd', 'mblower', 'partitions']
 WHOLE_DISK_FORMAT_ROLES = ['LUKS', 'bcache', 'bcachecdev']
 
 
@@ -267,6 +267,10 @@ class DiskMixin(object):
                 # Network block device: we will use it like a one-partition
                 # disk but not report any advanced functionality.
                 disk_roles_identified['nbd'] = d.name
+            if d.label.startswith('MBLower'):
+                # Minebox lower-level disk, don't not support pools or shares
+                # on that disk.
+                disk_roles_identified['mblower'] = d.name
             if d.root is True:
                 # ROOT DISK: scan_disks() has already identified the current
                 # truth regarding the device hosting our root '/' fs so update

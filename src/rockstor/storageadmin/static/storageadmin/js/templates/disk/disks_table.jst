@@ -53,6 +53,7 @@
         {{else if (isNBD this.role)}}
             <i class="glyphicon glyphicon-home" title="Minebox storage disk." rel="tooltip"></i>
         {{else if this.parted}}
+            {{#unless (isMBLower this.role)}}
             {{#if (hasUserRole this.role)}}
                 <a href="#disks/role/{{this.id}}" class="user_role_part" data-disk-id="{{this.id}}" title="User Assigned Role found on partitioned disk, click to edit." rel="tooltip">
                 <i class="glyphicon glyphicon-tags"></i></a>
@@ -72,6 +73,7 @@
                     Click to configure or wipe." rel="tooltip"><i class="glyphicon glyphicon-cog"></i></a>
                 {{/if}}
             {{/if}}
+            {{/unless}}
         {{else}} <!-- We are non of the above top level ifs / else ifs at this point -->
             {{#if (isNullPoolBtrfs this.btrfs_uuid this.pool_name)}}
                 <a href="#disks/role/{{this.id}}" class="user_role_part" data-disk-id="{{this.id}}" title="Disk is unusable because it has an existing whole disk BTRFS filesystem on it.
@@ -121,6 +123,8 @@
       <td>
         {{#if pool_name}}
         <a href="#pools/{{this.pool}}">{{this.pool_name}}</a>
+        {{else if (isMBLower this.role)}}
+        Minebox backend
         {{/if}}
       </td>
       <td>
