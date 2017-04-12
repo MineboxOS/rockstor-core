@@ -23,7 +23,8 @@ from storageadmin.views.email_client import update_generic
 from storageadmin.util import handle_exception
 from storageadmin.serializers import ApplianceSerializer
 
-from system.osi import (hostid, sethostname, gethostname)
+from system.osi import (hostid, sethostname, gethostname,
+                        setmineboxkey, getmineboxkey)
 import rest_framework_custom as rfc
 from cli.rest_util import (api_call, set_token)
 from smart_manager.models import Replica
