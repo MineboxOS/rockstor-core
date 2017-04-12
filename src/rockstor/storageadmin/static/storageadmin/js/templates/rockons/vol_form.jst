@@ -6,12 +6,14 @@
     <div class="messages"></div>
     {{#each volumes}}
         <div class="form-group">
-            <label class="control-label col-sm-3" for="shares">{{this.label}}<span class="required">*</span></label>
+            <label class="control-label col-sm-3" for="{{this.id}}">{{this.label}}<span class="required">*</span></label>
             <div class="col-sm-5">
-                <select class="form-control" type="text" id="{{this.id}}" name="{{this.id}}" data-placeholder="Select shares to export" >
+                <select class="form-control" type="text" id="{{this.id}}" name="{{this.id}}" data-placeholder="Select share" >
                     <option></option>
                     {{#each ../shares}}
+                    {{#unless (isSystem this)}}
                         <option value="{{this.name}}">{{this.name}}</option>
+                    {{/unless}}
                     {{/each}}
                </select>
            </div>
