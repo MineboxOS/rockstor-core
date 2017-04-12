@@ -416,6 +416,14 @@ RockonsView = RockstorLayoutView.extend({
             }
             return new Handlebars.SafeString(html);
         });
+
+        // Identify system-only shares by return of true / false.
+        Handlebars.registerHelper('isSystem', function (share) {
+            if (share.name == 'root' && share.pool.name == 'System') {
+                return true;
+            }
+            return false;
+        });
     }
 
 });
