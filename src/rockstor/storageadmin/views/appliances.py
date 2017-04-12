@@ -114,8 +114,8 @@ class ApplianceListView(rfc.GenericView):
                                       current_appliance=True)
                 if ('hostname' in request.data):
                     appliance.hostname = request.data['hostname']
-                if ('mbkey' in request.data):
-                    appliance.minebox_key = request.data['mbkey']
+                if ('minebox_key' in request.data):
+                    appliance.minebox_key = request.data['minebox_key']
                 appliance.save()
                 sethostname(appliance.hostname)
                 setmineboxkey(appliance.minebox_key)
