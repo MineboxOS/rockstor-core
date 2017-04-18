@@ -75,6 +75,7 @@
             {{/if}}
             {{/unless}}
         {{else}} <!-- We are non of the above top level ifs / else ifs at this point -->
+            {{#unless (isMBLower this.role)}}
             {{#if (isNullPoolBtrfs this.btrfs_uuid this.pool_name)}}
                 <a href="#disks/role/{{this.id}}" class="user_role_part" data-disk-id="{{this.id}}" title="Disk is unusable because it has an existing whole disk BTRFS filesystem on it.
                 Click to configure or wipe." rel="tooltip"><i class="fa fa-eraser"></i></a>&nbsp;<a href="#" class="btrfs_import" data-disk-id="{{this.id}}" title="Click to import data (pools, shares and snapshots) on this disk automatically. Multi-device support included." rel="tooltip">
@@ -97,6 +98,7 @@
                     {{/if}}
                 {{/if}}
             {{/if}}
+            {{/unless}}
         {{/if}}
           <!-- All of the following are additive role identification flags,
           they are found independently and in addition to other roles.

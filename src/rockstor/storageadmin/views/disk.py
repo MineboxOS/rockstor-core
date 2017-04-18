@@ -267,7 +267,7 @@ class DiskMixin(object):
                 # Network block device: we will use it like a one-partition
                 # disk but not report any advanced functionality.
                 disk_roles_identified['nbd'] = d.name
-            if d.label.startswith('MBLower'):
+            if d.label and d.label.startswith('MBLower'):
                 # Minebox lower-level disk, don't not support pools or shares
                 # on that disk.
                 disk_roles_identified['mblower'] = d.name
