@@ -51,6 +51,7 @@
             {{/if}}
             {{/unless}}
         {{else}} <!-- We are non of the above top level ifs / else ifs at this point -->
+            {{#unless (isMBLower this.role)}}
             {{#if (hasUserRole this.role)}}
                 <a href="#" class="user_role_drive" data-disk-name="{{this.name}}" title="Whole Disk User Assigned Role found, click to edit." rel="tooltip">
                 <i class="glyphicon glyphicon-tag"></i></a>
@@ -60,6 +61,7 @@
                 Click to configure or wipe." rel="tooltip"><i class="fa fa-eraser"></i></a>&nbsp;<a href="#" class="btrfs_import" data-disk-name="{{this.name}}" title="Click to import data (pools, shares and snapshots) on this disk automatically. Multi-device support included." rel="tooltip">
                 <i class="glyphicon glyphicon-circle-arrow-down"></i></a>
             {{/if}}
+            {{/unless}}
         {{/if}}
         {{#if (isLuksContainer this.role)}}
             <a href="#" class="luks_drive" data-disk-name="{{this.name}}" title="Full Disk LUKS Container (UI pending)." rel="tooltip">
