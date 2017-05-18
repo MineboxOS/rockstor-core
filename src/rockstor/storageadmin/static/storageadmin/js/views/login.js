@@ -115,6 +115,10 @@ LoginView = InitView.extend({
     render: function() {
         var _this = this;
         if (!RockStorGlobals.setup_user) {
+            if (!getCookie('minebox_setup')) {
+                window.location.replace('/static/minebox/setup/');
+                return this;
+            }
             $(this.el).append(this.user_create_template());
             this.validator = this.$('#user-create-form').validate({
                 onfocusout: false,
