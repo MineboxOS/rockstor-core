@@ -31,7 +31,6 @@ class Appliance(models.Model):
     mgmt_port = models.IntegerField(default=443)
     client_id = models.CharField(max_length=100, null=True)
     client_secret = models.CharField(max_length=255, null=True)
-    minebox_key = models.CharField(max_length=255, null=True)
 
     @property
     def ipaddr(self, *args, **kwargs):

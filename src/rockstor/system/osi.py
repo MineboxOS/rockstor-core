@@ -51,7 +51,6 @@ HOSTNAMECTL = '/usr/bin/hostnamectl'
 LS = '/usr/bin/ls'
 LSBLK = '/usr/bin/lsblk'
 BLKID = '/usr/sbin/blkid'
-MBKEY = '/usr/lib/minebox/mbkey.sh'
 MKDIR = '/bin/mkdir'
 MOUNT = '/bin/mount'
 NMCLI = '/usr/bin/nmcli'
@@ -766,14 +765,6 @@ def sethostname(hostname):
 def gethostname():
     o, e, rc = run_command([HOSTNAMECTL, '--static'])
     return o[0]
-
-
-def setmineboxkey(mbkey):
-    return run_command([MBKEY, 'set', mbkey])
-
-
-def getmineboxkey(mbkey):
-    return run_command([MBKEY, 'get'])
 
 
 def is_share_mounted(sname, mnt_prefix=DEFAULT_MNT_DIR):
