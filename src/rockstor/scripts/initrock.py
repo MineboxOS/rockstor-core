@@ -324,7 +324,7 @@ def main():
         logging.info('Creating openssl cert...')
         run_command([OPENSSL, 'req', '-nodes', '-newkey', 'rsa:2048',
                      '-keyout', '%s/first.key' % cert_loc, '-out',
-                     '%s/rockstor.csr' % cert_loc, '-subj', dn])
+                     '%s/rockstor.csr' % cert_loc, '-sha256', '-subj', dn])
         logging.debug('openssl cert created')
         logging.info('Creating rockstor key...')
         run_command([OPENSSL, 'rsa', '-in', '%s/first.key' % cert_loc, '-out',
@@ -333,7 +333,7 @@ def main():
         logging.info('Singing cert with rockstor key...')
         run_command([OPENSSL, 'x509', '-in', '%s/rockstor.csr' % cert_loc,
                      '-out', '%s/rockstor.cert' % cert_loc, '-req', '-signkey',
-                     '%s/rockstor.key' % cert_loc, '-days', '3650'])
+                     '%s/rockstor.key' % cert_loc, '-days', '3650', '-sha256'])
         logging.debug('cert signed.')
         logging.info('restarting nginx...')
         run_command([SUPERCTL, 'restart', 'nginx'])
