@@ -31,6 +31,7 @@
         {{else if (isNBD this.role)}}
             <i class="glyphicon glyphicon-home" title="Minebox storage disk." rel="tooltip"></i>
         {{else if this.parted}}
+            {{#unless (isMBKey this.role)}}
             {{#unless (isMBLower this.role)}}
             {{#if (hasUserRole this.role)}}
                 <a href="#disks/role/{{this.name}}" class="user_role_part" data-disk-name="{{this.name}}" title="User Assigned Role found on partitioned disk, click to edit." rel="tooltip">
@@ -49,6 +50,7 @@
                     Click to configure or wipe." rel="tooltip"><i class="glyphicon glyphicon-cog"></i></a>
                 {{/if}}
             {{/if}}
+            {{/unless}}
             {{/unless}}
         {{else}} <!-- We are non of the above top level ifs / else ifs at this point -->
             {{#unless (isMBLower this.role)}}
@@ -98,6 +100,8 @@
         <a href="#pools/{{this.pool_name}}">{{this.pool_name}}</a>
         {{else if (isMBLower this.role)}}
         Minebox backend
+        {{else if (isMBKey this.role)}}
+        Minebox key
         {{/if}}
       </td>
       <td>

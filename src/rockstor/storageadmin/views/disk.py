@@ -42,7 +42,7 @@ logger = logging.getLogger(__name__)
 # and the post processing present in scan_disks()
 # LUKS currently stands for full disk crypto container.
 SCAN_DISKS_KNOWN_ROLES = ['mdraid', 'root', 'LUKS', 'openLUKS', 'bcache',
-                          'bcache-cdev', 'nbd', 'mblower', 'partitions']
+                          'bcache-cdev', 'nbd', 'mblower', 'mbkey', 'partitions']
 
 
 class DiskMixin(object):
@@ -214,6 +214,9 @@ class DiskMixin(object):
                 # Minebox lower-level disk, don't not support pools or shares
                 # on that disk.
                 disk_roles_identified['mblower'] = d.name
+            if d.label and d.label == 'MINEBOXKEY':
+                # Minebox key USB stick, don't support using that disk.
+                disk_roles_identified['mbkey'] = d.name
             if d.root is True:
                 # ROOT DISK: scan_disks() has already identified the current
                 # truth regarding the device hosting our root '/' fs so update
