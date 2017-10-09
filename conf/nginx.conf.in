@@ -89,5 +89,14 @@ http {
 			proxy_set_header Upgrade $http_upgrade;
 			proxy_set_header Connection "upgrade";
 		}
+		location /mug/ {
+			proxy_pass http://127.0.0.1:5000/;
+		}
+		location /bkupsvc/ {
+			proxy_pass http://127.0.0.1:5100/;
+		}
+		location /minebd/ {
+			proxy_pass http://127.0.0.1:8080/;
+		}
 	}
 }
