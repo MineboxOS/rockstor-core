@@ -50,6 +50,7 @@ HOSTID = '/usr/bin/hostid'
 HOSTNAMECTL = '/usr/bin/hostnamectl'
 LS = '/usr/bin/ls'
 LSBLK = '/usr/bin/lsblk'
+BLKID = '/usr/sbin/blkid'
 MKDIR = '/bin/mkdir'
 MOUNT = '/bin/mount'
 NMCLI = '/usr/bin/nmcli'
@@ -116,6 +117,44 @@ def run_command(cmd, shell=False, stdout=subprocess.PIPE,
     return (out, err, rc)
 
 
+def parse_line(linedata):
+    lmap = {}  # to hold info from command output in that line
+    # line parser variables
+    cur_name = ''
+    cur_val = ''
+    name_iter = True
+    val_iter = False
+    sl = linedata.strip()
+    i = 0
+    while i < len(sl):
+        # We iterate over the line to parse it's information char by char
+        # keeping track of name or value and adding the char accordingly
+        if (name_iter and sl[i] == '=' and sl[i + 1] == '"'):
+            name_iter = False
+            val_iter = True
+            i = i + 2
+        elif (val_iter and sl[i] == '"' and
+                (i == (len(sl) - 1) or sl[i + 1] == ' ')):
+            val_iter = False
+            name_iter = True
+            i = i + 2
+            lmap[cur_name.strip()] = cur_val.strip()
+            cur_name = ''
+            cur_val = ''
+        elif (name_iter) and (sl[i] == ' ' or sl[i] == ':'):
+            cur_name = ''
+            i = i + 1
+        elif (name_iter):
+            cur_name = cur_name + sl[i]
+            i = i + 1
+        elif (val_iter):
+            cur_val = cur_val + sl[i]
+            i = i + 1
+        else:
+            raise Exception('Failed to parse command output: %s' % sl)
+    return lmap
+
+
 def scan_disks(min_size):
     """
     Using lsblk we scan all attached disks and categorize them according to
@@ -152,37 +191,7 @@ def scan_disks(min_size):
         # easy read categorization flags, all False until found otherwise.
         is_root_disk = False  # base dev that / is mounted on ie system disk
         is_partition = is_btrfs = False
-        dmap = {}  # to hold line info from lsblk output eg NAME: sda
-        # line parser variables
-        cur_name = ''
-        cur_val = ''
-        name_iter = True
-        val_iter = False
-        sl = line.strip()
-        i = 0
-        while i < len(sl):
-            # We iterate over the line to parse it's information char by char
-            # keeping track of name or value and adding the char accordingly
-            if (name_iter and sl[i] == '=' and sl[i + 1] == '"'):
-                name_iter = False
-                val_iter = True
-                i = i + 2
-            elif (val_iter and sl[i] == '"' and
-                    (i == (len(sl) - 1) or sl[i + 1] == ' ')):
-                val_iter = False
-                name_iter = True
-                i = i + 2
-                dmap[cur_name.strip()] = cur_val.strip()
-                cur_name = ''
-                cur_val = ''
-            elif (name_iter):
-                cur_name = cur_name + sl[i]
-                i = i + 1
-            elif (val_iter):
-                cur_val = cur_val + sl[i]
-                i = i + 1
-            else:
-                raise Exception('Failed to parse lsblk output: %s' % sl)
+        dmap =  parse_line(line)  # info from lsblk output eg NAME: sda
         # md devices, such as mdadmin software raid and some hardware raid
         # block devices show up in lsblk's output multiple times with identical
         # info.  Given we only need one copy of this info we remove duplicate
@@ -199,6 +208,25 @@ def scan_disks(min_size):
         # N.B. this also facilitates a simpler mechanism of classification.
         if (dmap['FSTYPE'] == 'swap'):
             continue
+
+        # The lsblk man page states: "The authoritative information about
+        # filesystems and raids is provided by the blkid(8) command."
+        # So actually get filesystem-related info from there.
+        try:
+            fcmd = [BLKID, '/dev/%s' % dmap['NAME']]
+            fo, fe, frc = run_command(fcmd)
+            fmap = parse_line(fo[0]) # info from blkid output
+            # Entries don't always exist in fmap so overwrite dmap if they do.
+            if 'TYPE' in fmap and fmap['TYPE']:
+              dmap['FSTYPE'] = fmap['TYPE']
+            if 'LABEL' in fmap and fmap['LABEL']:
+              dmap['LABEL'] = fmap['LABEL']
+            if 'UUID' in fmap and fmap['UUID']:
+              dmap['UUID'] = fmap['UUID']
+        except:
+            # If blkid doesn't give us anything, let's ignore it.
+            pass
+
         # convert size into KB
         size_str = dmap['SIZE']
         if (size_str[-1] == 'G'):
