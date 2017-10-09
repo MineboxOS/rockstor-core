@@ -1127,6 +1127,10 @@ def get_disk_serial(device_name, device_type=None, test=None):
                 # have found nothing else.
                 if serial_num == '':
                     serial_num = line_fields[2]
+            elif line_fields[1] == 'MAJOR' and line_fields[2] == '43':
+                # nbd devices have the major number 43, use device name as serial (but not exactly as UI does error on that as well).
+                if serial_num == '':
+                    serial_num = 'mi%s' % device_name
     # should return one of the following in order of priority
     # SCSI_SERIAL, SERIAL_SHORT, SERIAL
     return serial_num
@@ -1152,6 +1156,8 @@ def get_virtio_disk_serial(device_name):
     This process may not deal well with spaces in the serial number
     but VMM does not allow this.
     """
+    if device_name.startswith("nbd"):
+        return 'mi%s' % device_name
     dev_path = ('/sys/block/%s/serial' % device_name)
     out, err, rc = run_command([CAT, dev_path], throw=False)
     if (rc != 0):
@@ -1667,6 +1673,16 @@ def get_byid_name_map():
                             byid_name_map[line_fields[-1]]):
                         # The current line's by-id name is longer so use it.
                         byid_name_map[line_fields[-1]] = line_fields[-5]
+    try:
+        out, err, rc = run_command([LS, '-1', '/dev/nbd*'],
+                                   throw=True)
+        if rc == 0:
+            for each_line in out:
+                line_fields = each_line.split("/")
+                byid_name_map['nbd-Disk-' + line_fields[-1][3:]] = line_fields[-1]
+    except:
+        # No need to do anything if nbd stuff fails.
+        pass
     return byid_name_map
 
 
@@ -2020,6 +2036,8 @@ def enter_standby(dev_byid):
     :return: None or out, err, rc of command
     """
     # TODO: candidate for move to system/hdparm
+    if dev_byid.startswith("nbd"):
+        return None
     hdparm_command = [HDPARM, '-q', '-y', get_device_path(dev_byid)]
     return run_command(hdparm_command)
 
