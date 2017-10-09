@@ -1697,6 +1697,9 @@ def get_device_path(by_id):
     not there. See https://github.com/rockstor/rockstor-core/pull/1704 for
     some discussion of this topic.
     """
+    if by_id.startswith('nbd'):
+        # NBD right now has no by-id entries.
+        return '/dev/' + by_id
     return '/dev/disk/by-id/%s' % by_id
 
 
