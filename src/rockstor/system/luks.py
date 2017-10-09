@@ -196,7 +196,7 @@ def get_unlocked_luks_containers_uuids():
     if len(out) > 0 and rc == 0:
         # The output has at least one line and our dmsetup executed OK.
         for each_line in out:
-            if each_line == '':
+            if each_line == '' or each_line == 'No devices found':
                 continue
             backing_container_uuid = None
             if len(each_line) == 41 and re.match('luks-', each_line):
