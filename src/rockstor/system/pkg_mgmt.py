@@ -158,7 +158,7 @@ def update_check(subscription=None):
     if (subscription is not None):
         switch_repo(subscription)
 
-    pkg = 'rockstor'
+    pkg = 'minebox'
     version, date = rpm_build_info(pkg)
     o, e, rc = run_command([YUM, 'changelog', date, pkg])
     log = False
@@ -170,9 +170,9 @@ def update_check(subscription=None):
             available = True
         if (not available):
             continue
-        if (new_version is None and (re.match('rockstor-', l) is not None)):
+        if (new_version is None and (re.match('minebox-', l) is not None)):
             new_version = l.split()[0].split(
-                'rockstor-')[1].split('.x86_64')[0]
+                'minebox-')[1].split('.x86_64')[0]
         if (log is True):
             updates.append(l)
             if (len(l.strip()) == 0):
@@ -187,7 +187,7 @@ def update_check(subscription=None):
         if (rc == 1):
             for l in o:
                 if (re.search('will be an update', l) is not None):
-                    if (re.search('rockstor.x86_64', l) is not None):
+                    if (re.search('minebox.x86_64', l) is not None):
                         new_version = l.strip().split()[3].split(':')[1]
 
     return (version, new_version, updates)

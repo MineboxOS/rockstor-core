@@ -73,12 +73,14 @@ var HomeLayoutView = RockstorLayoutView.extend({
                         type: 'PUT',
                         dataType: 'json',
                         success: function(data, status, xhr) {
+                            /*
                             $('#update-version-modal').modal({
                                 keyboard: false,
                                 show: false,
                                 backdrop: 'static'
                             });
                             $('#update-version-modal').modal('show');
+                            */
 
                         },
                         error: function(xhr, status, error) {
@@ -89,6 +91,7 @@ var HomeLayoutView = RockstorLayoutView.extend({
                     var subscriptions = new UpdateSubscriptionCollection();
                     subscriptions.fetch({
                         success: function(collection, response, options) {
+                            /*
                             if (collection.length == 0) {
                                 $('#update-channel-modal').modal({
                                     keyboard: false,
@@ -97,6 +100,7 @@ var HomeLayoutView = RockstorLayoutView.extend({
                                 });
                                 $('#update-channel-modal').modal('show');
                             }
+                            */
 
                         }
                     });

@@ -4,7 +4,7 @@ $(document).ready(function(){
 });
 </script>
 
-<div class="row">
+<!-- div class="row">
   <div class="col-md-8 col-md-offset-2">
 
     {{#is_sub_active defaultSub}}
@@ -90,15 +90,15 @@ $(document).ready(function(){
       </tbody>
     </table>
     {{/is_sub_active}}
-  </div><!-- col-md-8 -->
-</div><!-- row-->
+  </div><- col-md-8 ->
+</div --><!-- row-->
 
 
 {{#update_available}}
 <br>
 <div class="col-sm-offset-3 col-sm-6 col-sm-offset-3">
   <div id="updateInfo">
-    <h3><strong>Rockstor {{mostRecentVersion}}</strong> update is available! </h3>
+    <h3><strong>Minebox {{mostRecentVersion}}</strong> update is available! </h3>
   </div>
 </div>&nbsp;&nbsp;&nbsp;&nbsp;
 <br><br>
@@ -133,7 +133,7 @@ $(document).ready(function(){
 {{else}}
 <div class="col-md-offset-3 col-md-6 col-md-offset-3">
   <div id="updateInfo">
-    <h3>System is running the latest Rockstor version: {{currentVersion}}</h3>
+    <h3>System is running the latest Minebox version: {{currentVersion}}</h3>
     <p>If you've updated recently, reload the browser<b>(Ctrl+Shift+R)</b> for latest UI changes.</p><br>
 
     {{#if autoUpdateEnabled}}
@@ -161,14 +161,14 @@ $(document).ready(function(){
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-	<h4>Rockstor is being updated to the latest version. Please wait... &nbsp;&nbsp; </h4>
+	<h4>Minebox is being updated to the latest version. Please wait... &nbsp;&nbsp; </h4>
       </div>
       <div class="modal-body">
 	<div style="text-align: center">
 	  <img src="/static/storageadmin/img/ajax-loader-big.gif">
 	  <div id="time-left"></div>
 	</div>
-	<div id="user-msg" style="display: none">The Rockstor update is still going on. if the page does not automatically refresh after a few minutes, please try manually refreshing after some time.</div>
+	<div id="user-msg" style="display: none">The Minebox update is still going on. if the page does not automatically refresh after a few minutes, please try manually refreshing after some time.</div>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 # module level variable so it's computed once per process.
 version = 'unknown'
 try:
-    version, date = rpm_build_info('rockstor')
+    version, date = rpm_build_info('minebox')
 except Exception as e:
     logger.exception(e)
 
@@ -42,6 +42,6 @@ def handle_exception(e, request, e_msg=None, status_code=500):
         e_msg = e.__str__()
 
     logger.exception('exception: %s' % e.__str__())
-    logger.debug('Current Rockstor version: %s' % version)
+    logger.debug('Current Minebox version: %s' % version)
     raise RockStorAPIException(status_code=status_code, detail=e_msg,
                                trace=traceback.format_exc())

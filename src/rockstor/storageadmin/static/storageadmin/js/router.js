@@ -1068,9 +1068,9 @@ $(document).ready(function() {
         var currentVersion = data[0];
         var mostRecentVersion = data[1];
         if (currentVersion != mostRecentVersion) {
-            $('#version-msg').html('RockStor ' + currentVersion + ' <i class="glyphicon glyphicon-arrow-up"></i>');
+            $('#version-msg').html('Minebox ' + currentVersion + ' <i class="glyphicon glyphicon-arrow-up"></i>');
         } else {
-            $('#version-msg').html('RockStor ' + currentVersion);
+            $('#version-msg').html('Minebox ' + currentVersion);
         }
     };
 
