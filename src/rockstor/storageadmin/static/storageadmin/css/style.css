@@ -378,6 +378,7 @@ select, textarea, input[type="text"], input[type="password"], input[type="dateti
 }
 
 .logo {
+    margin-top: 18px;
     width: 150px;
     transform: translateY(50%);
 }
