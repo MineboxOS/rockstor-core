@@ -307,7 +307,8 @@ def main():
     logging.basicConfig(format='%(asctime)s: %(message)s', level=loglevel)
     set_def_kernel(logging)
     try:
-        delete_old_kernels(logging)
+        # Only keep the current and default kernel(s), ideally a single one.
+        delete_old_kernels(logging, 1)
     except Exception as e:
         logging.debug('Exception while deleting old kernels. Soft error. '
                       'Moving on.')
