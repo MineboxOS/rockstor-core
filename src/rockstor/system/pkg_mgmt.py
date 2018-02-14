@@ -84,7 +84,7 @@ def auto_update_status():
 
 
 def current_version():
-    out, err, rc = run_command([RPM, '-qi', 'rockstor'], throw=False)
+    out, err, rc = run_command([RPM, '-qi', 'minebox'], throw=False)
     if (rc != 0):
         return '0.0-0'
     return ('%s-%s' % (out[1].split(':')[-1].strip(),
@@ -158,7 +158,7 @@ def update_check(subscription=None):
     if (subscription is not None):
         switch_repo(subscription)
 
-    pkg = 'rockstor'
+    pkg = 'minebox'
     version, date = rpm_build_info(pkg)
     o, e, rc = run_command([YUM, 'changelog', date, pkg])
     log = False
@@ -170,9 +170,9 @@ def update_check(subscription=None):
             available = True
         if (not available):
             continue
-        if (new_version is None and (re.match('rockstor-', l) is not None)):
+        if (new_version is None and (re.match('minebox-', l) is not None)):
             new_version = l.split()[0].split(
-                'rockstor-')[1].split('.x86_64')[0]
+                'minebox-')[1].split('.x86_64')[0]
         if (log is True):
             updates.append(l)
             if (len(l.strip()) == 0):
@@ -187,7 +187,7 @@ def update_check(subscription=None):
         if (rc == 1):
             for l in o:
                 if (re.search('will be an update', l) is not None):
-                    if (re.search('rockstor.x86_64', l) is not None):
+                    if (re.search('minebox.x86_64', l) is not None):
                         new_version = l.strip().split()[3].split(':')[1]
 
     return (version, new_version, updates)
@@ -211,7 +211,7 @@ def update_run(subscription=None, yum_update=False):
             atfo.write('%s --setopt=timeout=600 -y update\n' % YUM)
             atfo.write('%s start rockstor\n' % SYSTEMCTL)
         else:
-            atfo.write('%s --setopt=timeout=600 -y -x rock* update\n' % YUM)
+            atfo.write('%s --setopt=timeout=600 -y -x minebox-rock* update\n' % YUM)
         atfo.write('/bin/rm -f %s\n' % npath)
     out, err, rc = run_command([AT, '-f', npath, 'now + 1 minutes'])
     time.sleep(120)
@@ -281,7 +281,7 @@ def yum_check():
     # and 100 if at least 1 update available
     # Using -x rockstor* to avoid having Rockstor updated here
     # instead of Rockstor "ad hoc" updater
-    out, err, rc = run_command([YUM, 'check-update', '-q', '-x', 'rock*'],
+    out, err, rc = run_command([YUM, 'check-update', '-q', '-x', 'minebox-rock*'],
                                throw=False)
     packages = []
     # Read check-update output skipping first and last empty line
